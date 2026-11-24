@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrend Analytics | Student Performance Trend Analysis (Case Study 17)</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js for smooth data visualization (with built-in SVG fallback) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18" stroke-linecap="round"/>
+                        <path d="M7 16l4-5 4 3 6-8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="7" cy="16" r="2" fill="currentColor"/>
+                        <circle cx="11" cy="11" r="2" fill="currentColor"/>
+                        <circle cx="15" cy="14" r="2" fill="currentColor"/>
+                        <circle cx="21" cy="6" r="2" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>EduTrend <span>Analytics</span></h1>
+                    <span class="badge-sub">Case Study #17 • Student Performance Trend Analysis</span>
+                </div>
+            </div>
+
+            <!-- Global Action Controls -->
+            <div class="header-actions">
+                <button class="btn btn-outline" id="loadDemoBtn" title="Load standardized 5-student cohort">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Load Sample Cohort
+                </button>
+                <button class="btn btn-primary" id="openAddModalBtn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Student
+                </button>
+                <button class="btn btn-danger-outline" id="clearDataBtn" title="Reset all records">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs-wrapper">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="dashboard">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="9"></rect>
+                        <rect x="14" y="3" width="7" height="5"></rect>
+                        <rect x="14" y="12" width="7" height="9"></rect>
+                        <rect x="3" y="16" width="7" height="5"></rect>
+                    </svg>
+                    Batch Dashboard
+                </button>
+                <button class="nav-tab" data-tab="scorecards">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Individual Scorecards
+                </button>
+                <button class="nav-tab" data-tab="roster">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Cohort Roster
+                </button>
+                <button class="nav-tab" data-tab="documentation">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    Academic Report & Code
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+        <!-- ================= TAB 1: BATCH DASHBOARD ================= -->
+        <section id="dashboardTab" class="tab-pane active">
+            <!-- Top Metric Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card" id="kpiTotalStudents">
+                    <div class="kpi-icon indigo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Total Enrolled Cohort</span>
+                        <h2 class="kpi-value" id="valTotalStudents">5</h2>
+                        <span class="kpi-sub">Students analyzed across 3 exams</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card" id="kpiTopper">
+                    <div class="kpi-icon gold">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="8" r="7"></circle>
+                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                        </svg>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Class Academic Topper</span>
+                        <h2 class="kpi-value" id="valTopperName">Alice Smith</h2>
+                        <span class="kpi-sub badge-pill success" id="valTopperScore">88.25% Cumulative Mean</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card" id="kpiMostImproved">
+                    <div class="kpi-icon emerald">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Most Improved Student</span>
+                        <h2 class="kpi-value" id="valImprovedName">Bob Jenkins</h2>
+                        <span class="kpi-sub badge-pill success" id="valImprovedScore">+23.5% Net Growth</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card" id="kpiChallengingSub">
+                    <div class="kpi-icon rose">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Most Challenging Subject</span>
+                        <h2 class="kpi-value" id="valChallengingSub">Mathematics</h2>
+                        <span class="kpi-sub badge-pill danger" id="valChallengingCount">1 Student consistently weak</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Section: Progression Chart & Performance Distribution -->
+            <div class="dashboard-grid-2">
+                <!-- Batch Trajectory Chart Card -->
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Cohort Academic Progression Trajectory</h3>
+                            <p class="card-desc">Mean performance across Exam 1 (Internal), Exam 2 (Mid-Term), and Exam 3 (Final)</p>
+                        </div>
+                        <span class="trajectory-indicator" id="batchNetTrendBadge">+0.7% Overall Net</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="cohortChartContainer">
+                            <canvas id="cohortTrajectoryChart" height="240"></canvas>
+                        </div>
+                        <!-- Exam Averages Badges -->
+                        <div class="exam-mean-ribbon">
+                            <div class="mean-box">
+                                <span class="mean-exam-label">Exam 1 (Internal)</span>
+                                <span class="mean-exam-val" id="exam1MeanVal">64.00%</span>
+                            </div>
+                            <div class="mean-divider">→</div>
+                            <div class="mean-box">
+                                <span class="mean-exam-label">Exam 2 (Mid-Term)</span>
+                                <span class="mean-exam-val" id="exam2MeanVal">64.45%</span>
+                            </div>
+                            <div class="mean-divider">→</div>
+                            <div class="mean-box">
+                                <span class="mean-exam-label">Exam 3 (Final)</span>
+                                <span class="mean-exam-val" id="exam3MeanVal">64.65%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Breakdown Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Performance Category Distribution</h3>
+                            <p class="card-desc">Objective pedagogical classification across cohort</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="categoryBarsList" class="category-bars-list">
+                            <!-- Populated dynamically via app.js -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Weakness Audit Card -->
+            <div class="card mt-24">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Subject-Wise Institutional Weakness & Failure Audit</h3>
+                        <p class="card-desc">Students failing the proficiency benchmark (&lt; 50.0%) across all assessments</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="subject-audit-grid" id="subjectAuditGrid">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: INDIVIDUAL SCORECARDS ================= -->
+        <section id="scorecardsTab" class="tab-pane">
+            <!-- Student Selector Toolbar -->
+            <div class="card scorecard-selector-card">
+                <div class="selector-row">
+                    <div class="selector-field">
+                        <label for="studentSelectDropdown">Select Student to Inspect:</label>
+                        <select id="studentSelectDropdown" class="form-select">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="scorecard-actions">
+                        <button class="btn btn-outline" id="printScorecardBtn">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            Print Report Card / PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Printable Student Scorecard Document -->
+            <div class="scorecard-container mt-24" id="printableScorecard">
+                <!-- Student Header Badge -->
+                <div class="scorecard-header-card">
+                    <div class="student-avatar-wrap">
+                        <div class="student-avatar" id="cardAvatarInitial">A</div>
+                        <div class="student-meta">
+                            <span class="student-code" id="cardStudentId">Student ID: #001</span>
+                            <h2 class="student-name" id="cardStudentName">Alice Smith</h2>
+                            <p class="student-program">B.Tech Computer Science & Engineering • Academic Batch 2026</p>
+                        </div>
+                    </div>
+                    <div class="student-tier-box">
+                        <span class="tier-label">Diagnostic Classification</span>
+                        <div class="tier-badge" id="cardClassificationBadge">Consistent High Performer</div>
+                        <span class="tier-cumulative" id="cardCumulativeMean">Cumulative Average: 88.25%</span>
+                    </div>
+                </div>
+
+                <!-- Marks & Trends Table Card -->
+                <div class="card mt-24">
+                    <div class="card-header">
+                        <h3 class="card-title">Multi-Examination Performance Matrix</h3>
+                        <span class="badge-neutral">Passing Benchmark: 50.0 / 100</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="report-table" id="studentMarksTable">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Exam 1 (Internal)</th>
+                                    <th>Exam 2 (Mid-Term)</th>
+                                    <th>E1 → E2 Diff</th>
+                                    <th>Exam 3 (Final)</th>
+                                    <th>E2 → E3 Diff</th>
+                                    <th>Net Trajectory</th>
+                                    <th>Subject Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentMarksTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                            <tfoot id="studentMarksTableFoot">
+                                <!-- Populated dynamically -->
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Diagnostics & Recommendations Grid -->
+                <div class="dashboard-grid-2 mt-24">
+                    <!-- Diagnostic Findings Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Diagnostic Audit & Deficiency Checks</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="audit-item" id="auditWeakSubjectsBox">
+                                <div class="audit-icon" id="auditWeakIcon">⚠️</div>
+                                <div class="audit-details">
+                                    <span class="audit-title">Consistently Weak Subjects (&lt; 50.0 in all exams)</span>
+                                    <p class="audit-desc" id="auditWeakSubjectsText">None — Cleared benchmark in at least one or all exams.</p>
+                                </div>
+                            </div>
+
+                            <div class="audit-item mt-16" id="auditDecliningBox">
+                                <div class="audit-icon" id="auditDecliningIcon">📉</div>
+                                <div class="audit-details">
+                                    <span class="audit-title">Continuous Downward Decay (E1 &gt; E2 &gt; E3)</span>
+                                    <p class="audit-desc" id="auditDecliningSubjectsText">None — No subjects under continuous decline.</p>
+                                </div>
+                            </div>
+
+                            <div class="audit-item mt-16">
+                                <div class="audit-icon">🎯</div>
+                                <div class="audit-details">
+                                    <span class="audit-title">Net Progression Vector (Exam 1 to Exam 3)</span>
+                                    <p class="audit-desc" id="auditNetVectorText">+6.5% Net Score Increase (Upward Trajectory)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Remarks & Chart Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Instructor Evaluation & Trajectory Chart</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="instructor-remark-box">
+                                <span class="remark-label">Faculty Diagnostic Recommendation:</span>
+                                <blockquote class="remark-quote" id="cardInstructorRemarks">
+                                    "Outstanding academic mastery maintained throughout. Recommended for honor recognition."
+                                </blockquote>
+                            </div>
+                            <div class="chart-container mt-16" id="individualChartWrap">
+                                <canvas id="individualProgressionChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: COHORT ROSTER ================= -->
+        <section id="rosterTab" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Registered Students Master Roster</h3>
+                        <p class="card-desc">Comparative tabular review of all enrolled candidates</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="roster-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Student Name</th>
+                                <th>Exam 1 Avg</th>
+                                <th>Exam 2 Avg</th>
+                                <th>Exam 3 Avg</th>
+                                <th>Overall Mean</th>
+                                <th>Net Trend</th>
+                                <th>Classification</th>
+                                <th>Quick Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rosterTableBody">
+                            <!-- Populated dynamically via app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: ACADEMIC REPORT & DOCUMENTATION ================= -->
+        <section id="documentationTab" class="tab-pane">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">Academic Project Documentation & Specifications</h3>
+                        <p class="card-desc">Case Study 17: Problem Statement, Grading Rubrics, Algorithm & Python Implementation</p>
+                    </div>
+                    <a href="student_performance_tracker.py" download class="btn btn-outline">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download student_performance_tracker.py
+                    </a>
+                </div>
+                <div class="card-body doc-content">
+                    <h3>1. Problem Statement</h3>
+                    <p>
+                        In educational institutions, assessing students through periodic examinations without analyzing their longitudinal performance trajectories causes critical learning gaps to remain undetected until summative final exams. This project delivers an automated, pure-Python analytical pipeline that tracks score progression, pinpoints consistently failing subjects, and categorizes students for targeted pedagogical support.
+                    </p>
+
+                    <h3 class="mt-20">2. Pedagogical Classification Rubric</h3>
+                    <div class="table-responsive">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Classification Category</th>
+                                    <th>Quantitative Decision Criteria</th>
+                                    <th>Target Academic Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="tier-pill tier-high">Consistent High Performer</span></td>
+                                    <td>Overall Average &ge; 75.0% AND Net Trajectory &ge; 0.0% AND Zero Weak Subjects</td>
+                                    <td>Nominate for Dean's Honor Roll and advanced research mentoring.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="tier-pill tier-improving">Progressive / Improving</span></td>
+                                    <td>Net Progression &ge; +5.0% AND Final Exam Average &ge; 50.0%</td>
+                                    <td>Encourage upward momentum and positive study habits.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="tier-pill tier-average">Consistent Average Performer</span></td>
+                                    <td>Stable scores between 50.0% and 75.0% with minimal fluctuations</td>
+                                    <td>Targeted subject tutoring to propel student toward distinction.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="tier-pill tier-declining">Declining / Needs Attention</span></td>
+                                    <td>Net Progression &le; -5.0% between first and final examinations</td>
+                                    <td>Urgent academic counselling to identify distress factors.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="tier-pill tier-critical">Critical / Remedial Required</span></td>
+                                    <td>Final Exam Average &lt; 50.0% OR &ge; 2 Consistently Weak Subjects</td>
+                                    <td>Mandatory diagnostic remedial tutoring and parental notice.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="mt-20">3. Python Nested Lists Data Representation</h3>
+                    <p>
+                        The core storage data structure strictly employs multidimensional nested lists in adherence with the introductory Python syllabus:
+                    </p>
+                    <pre class="code-block"><code>student_records = [
+    [
+        "Alice Smith",
+        [
+            [82.0, 88.0, 79.0, 91.0],  # Exam 1 (Internal)
+            [85.0, 90.0, 84.0, 94.0],  # Exam 2 (Mid-Term)
+            [89.0, 93.0, 88.0, 96.0]   # Exam 3 (Final)
+        ]
+    ],
+    ...
+]</code></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= ADD STUDENT MODAL ================= -->
+    <div class="modal-overlay" id="addStudentModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Student Academic Record</h3>
+                <button class="modal-close-btn" id="closeAddModalBtn">&times;</button>
+            </div>
+            <form id="addStudentForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="newStudentName" class="form-label">Student Full Name *</label>
+                        <input type="text" id="newStudentName" class="form-control" placeholder="e.g. John Doe" required>
+                    </div>
+
+                    <!-- Exam 1 Section -->
+                    <div class="exam-form-section">
+                        <div class="exam-form-title">Exam 1 (Internal Assessment) - Marks out of 100</div>
+                        <div class="marks-input-grid">
+                            <div class="form-group">
+                                <label class="sub-label">Mathematics</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e1_math" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Physics</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e1_phy" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Chemistry</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e1_chem" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Computer Science</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e1_cs" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exam 2 Section -->
+                    <div class="exam-form-section mt-16">
+                        <div class="exam-form-title">Exam 2 (Mid-Term Assessment) - Marks out of 100</div>
+                        <div class="marks-input-grid">
+                            <div class="form-group">
+                                <label class="sub-label">Mathematics</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e2_math" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Physics</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e2_phy" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Chemistry</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e2_chem" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Computer Science</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e2_cs" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exam 3 Section -->
+                    <div class="exam-form-section mt-16">
+                        <div class="exam-form-title">Exam 3 (Final / Model Exam) - Marks out of 100</div>
+                        <div class="marks-input-grid">
+                            <div class="form-group">
+                                <label class="sub-label">Mathematics</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e3_math" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Physics</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e3_phy" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Chemistry</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e3_chem" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="sub-label">Computer Science</label>
+                                <input type="number" min="0" max="100" step="0.5" class="form-control mark-input" id="m_e3_cs" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="cancelAddBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Student Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
